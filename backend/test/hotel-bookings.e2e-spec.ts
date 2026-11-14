@@ -378,10 +378,11 @@ describe('Hotel bookings & reviews (HTL-16..24, GEN-11) on a real MongoDB replic
     const first = await account();
     const second = await account();
     const held = await hold(first, oneRoom(roomA, 10, 12)).expect(201);
+    const overlapping = oneRoom(roomA, 11, 12); // fixed before the clock moves
     await advance(9 * 60 * 1000, first, second);
-    await hold(second, oneRoom(roomA, 11, 12)).expect(409);
+    await hold(second, overlapping).expect(409);
     await advance(60 * 1000 + 1, first, second);
-    await hold(second, oneRoom(roomA, 11, 12)).expect(201);
+    await hold(second, overlapping).expect(201);
     const expired = await get(`/hotel-bookings/${held.body.id}`, first.cookies).expect(200);
     expect(expired.body.status).toBe('EXPIRED');
     expect(await locks.countDocuments({ bookingId: held.body.id })).toBe(0);
@@ -419,9 +420,14 @@ describe('Hotel bookings & reviews (HTL-16..24, GEN-11) on a real MongoDB replic
         'metadata.reference': confirmed.body.reference,
       }),
     ).toBe(1);
+    const claims = await locks.find({ bookingId: held.body.id }).lean();
+    expect(claims).toHaveLength(2);
+    expect(claims.filter((c) => c.expiresAt !== undefined && c.expiresAt !== null)).toEqual([]);
     // A confirmed reservation is never expired by the hold timer.
+    // Dates are fixed before moving the clock so the test is stable around UTC midnight.
+    const sameNight = oneRoom(roomA, 11, 12);
     await advance(60 * 60 * 1000, traveler, other);
-    await hold(other, oneRoom(roomA, 11, 12)).expect(409);
+    await hold(other, sameNight).expect(409);
     expect((await get(`/hotel-bookings/${held.body.id}`, traveler.cookies)).body.status).toBe(
       'CONFIRMED',
     );
