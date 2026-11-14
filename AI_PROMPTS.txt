@@ -35,3 +35,12 @@ How to implement a reporting and content moderation workflow in MongoDB and Nest
 How the output was used:
 Used the explanation of the AI to design the compound unique index and administrative resolution endpoints.
 ================================================
+Date: 2026-11-15
+Student: Youssef Ayman
+Tool: Claude (Claude Code)
+Related Requirement: HTL-16, HTL-17, HTL-18, HTL-20, HTL-21, HTL-23, HTL-24, GEN-11
+Prompt:
+Act as my senior engineer: analyse the Triplify backend and implement my hotel bookings and reviews part (multi-room holds for 10 minutes, all-or-nothing reservations, confirmation only after payment verification, cancellation with refund tiers, completion, one review per completed stay, average ratings), with tests proving two concurrent reservations never claim the same room for overlapping dates.
+How the output was used:
+Used the generated design (room-night claims with a unique index inside a MongoDB transaction) and code for src/hotel-bookings, reviewed it, and kept the e2e tests on a MongoDB replica set as evidence for the concurrency requirement.
+================================================
