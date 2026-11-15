@@ -15,6 +15,7 @@ import { ReferenceDataModule } from './reference-data/reference-data.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ReportsModule } from './reports/reports.module';
 import { PaymentsModule } from './payments/payments.module';
+import { HotelBookingsModule } from './hotel-bookings/hotel-bookings.module';
 
 @ApiTags('Health')
 @Controller('health')
@@ -47,6 +48,7 @@ class HealthController {
     NotificationsModule,
     ReportsModule,
     PaymentsModule,
+    HotelBookingsModule,
     ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
   ],
   controllers: [HealthController],
